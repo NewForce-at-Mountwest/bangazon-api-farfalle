@@ -93,7 +93,7 @@ CREATE TABLE EmployeeTraining (
 CREATE TABLE ProductType (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	[Name] VARCHAR(55) NOT NULL,
-	isActive BIT NOT NULL DEFAULT(1)
+	IsActive BIT NOT NULL DEFAULT(1)
 );
 
 CREATE TABLE Customer (
@@ -112,7 +112,7 @@ CREATE TABLE Product (
 	Quantity INTEGER NOT NULL,
     CONSTRAINT FK_Product_ProductType FOREIGN KEY(ProductTypeId) REFERENCES ProductType(Id),
     CONSTRAINT FK_Product_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id),
-	isActive BIT NOT NULL DEFAULT(1)
+	IsActive BIT NOT NULL DEFAULT(1)
 );
 
 
@@ -122,7 +122,7 @@ CREATE TABLE PaymentType (
 	[Name] VARCHAR(55) NOT NULL,
 	CustomerId INTEGER NOT NULL,
     CONSTRAINT FK_PaymentType_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id),
-	isActive BIT NOT NULL DEFAULT(1)
+	IsActive BIT NOT NULL DEFAULT(1)
 );
 
 CREATE TABLE [Order] (
