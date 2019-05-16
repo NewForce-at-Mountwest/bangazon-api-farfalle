@@ -10,5 +10,13 @@ namespace BangazonAPI.Models
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        public List<PaymentType> PaymentTypes { get; set; } = new List<PaymentType>();
+        public List<Product> Products { get; set; } = new List<Product>();
+
+
+
+
+
     }
 }

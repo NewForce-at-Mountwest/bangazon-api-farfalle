@@ -12,5 +12,7 @@ namespace BangazonAPI.Models
         public string LastName { get; set; }
         public int DepartmentId { get; set; }
         public bool IsSuperVisor { get; set; }
+        public List<TrainingProgram> TrainingPrograms { get; set; } = new List<TrainingProgram>();
+
     }
 }
