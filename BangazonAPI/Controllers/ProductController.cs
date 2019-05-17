@@ -193,7 +193,7 @@ namespace BangazonAPI.Controllers
         }
         //delete the whole product
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id, bool HardDelete)
         {
             try
             {
@@ -202,8 +202,15 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Product SET IsActive = 0 WHERE Id = @id";                   
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        if (HardDelete == true)
+                        {
+                            cmd.CommandText = @"DELETE Product Where Id = @id";
+                        }
+                        else
+                        {
+                            cmd.CommandText = @"UPDATE Product SET IsActive = 0 WHERE Id = @id";
+                            cmd.Parameters.Add(new SqlParameter("@id", id));
+                        }
 
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)

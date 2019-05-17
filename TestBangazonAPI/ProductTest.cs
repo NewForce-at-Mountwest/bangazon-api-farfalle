@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
-using TestStudentExerciseUsingAPI;
+using TestBangazonAPI;
 
-namespace TestStudentExerciseUsingAPI
+namespace TestBangazonAPI
 {
 
     public class TestProducts
@@ -54,7 +54,8 @@ namespace TestStudentExerciseUsingAPI
         // Delete banana in the database and make sure we get a no content status code back
         public async Task deleteBanana(Product Banana, HttpClient client)
         {
-            HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/Product/{Banana.Id}");
+            //this makes sure there aren't a bunch of bananas chilling in our database by setting the hard delete bool to be true, thus ACTUALLY deleting the product vs. setting isActive = false
+            HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/Product/{Banana.Id}?HardDelete=true");
             deleteResponse.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
