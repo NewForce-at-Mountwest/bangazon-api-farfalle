@@ -1,4 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿//**********************************************************************************************//
+// This test should run to test the getAll, getSingle, Post, Put, and Delete 
+// on the Payment Types Resource.  The DELETE should HARD delete during the test
+//*********************************************************************************************//
+
+using Newtonsoft.Json;
 using BangazonAPI.Models;
 using System.Collections.Generic;
 using System.Net;
@@ -12,9 +17,7 @@ namespace TestBangazonAPI
 {
     public class TestPaymentType
     {
-
-        // Since we need to clean up after ourselves, we'll create and delete an paymentType when we test POST and PUT
-        // Otherwise, every time we ran our test suite it would create a new paymentType entry and we'd end up with a tooon of paymentType
+     
 
         // Create a new paymentType in the db and make sure we get a 200 OK status code back
 
@@ -51,7 +54,7 @@ namespace TestBangazonAPI
         // Delete a paymentType in the database and make sure we get a no content status code back
         public async Task deletePaymentType(PaymentType paymentType, HttpClient client)
         {
-            HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/paymentType/{paymentType.Id}");
+            HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/paymentType/{paymentType.Id}?HardDelete=true");
             deleteResponse.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
@@ -208,10 +211,10 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, getPaymentType.StatusCode);
 
-                // Make sure his name was in fact updated
+                // Make sure the name was in fact updated
                 Assert.Equal(newName, modifiedPaymentType.Name);
 
-                // Clean up after ourselves- delete him
+                // Clean up after ourselves- delete it
                 deletePaymentType(modifiedPaymentType, client);
             }
         }

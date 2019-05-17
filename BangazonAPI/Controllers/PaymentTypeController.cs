@@ -1,4 +1,12 @@
-﻿using BangazonAPI.Models;
+﻿//**********************************************************************************************//
+// This Controller gives the client access to getAll, getSingle, Post, Put, and Delete 
+// on the Payment Types Resource.  It does not support query functionality at this point.
+// Created by Sydney Wait
+//*********************************************************************************************//
+
+
+
+using BangazonAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -32,7 +40,7 @@ namespace BangazonAPI.Controllers
         }
 
 
-        //        // GET:Code for getting a list of PaymentTypes
+        //GET:Code for getting a list of PaymentTypes which are ACTIVE in the system
         [HttpGet]
         public async Task<IActionResult> GetAllPaymentTypes()
         {
@@ -82,7 +90,7 @@ namespace BangazonAPI.Controllers
 
 
 
-        //GET: Code for getting a single paymentType
+        //GET: Code for getting a single paymentType (active or not)
         [HttpGet("{id}", Name = "PaymentType")]
         public async Task<IActionResult> GetSinglePaymentType([FromRoute] int id)
         {
@@ -121,7 +129,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        //        // POST: Code for creating a paymentType
+        //  POST: Code for creating a paymentType
         [HttpPost]
         public async Task<IActionResult> PostPaymentType([FromBody] PaymentType paymentType)
         {
@@ -147,7 +155,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        //// PUT: Code for editing a paymentType
+        // PUT: Code for editing a paymentType
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPaymentType([FromRoute] int id, [FromBody] PaymentType paymentType)
         {
@@ -193,9 +201,9 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        //// DELETE: Code for deleting an exercise
+        // DELETE: Code for deleting a payment type--soft delete actually changes 'isActive' to 0 (false)
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePaymentType([FromRoute] int id)
+        public async Task<IActionResult> DeletePaymentType([FromRoute] int id, bool HardDelete )
         {
             try
             {
@@ -204,11 +212,19 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
+
+                        if(HardDelete == true)
+                        {
+                        cmd.CommandText = @"DELETE PaymentType
+                                              WHERE id = @id";
+                        }                    
+                        else { 
                         cmd.CommandText = @"UPDATE PaymentType
                                             SET isActive = 0
                                             WHERE id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        }
 
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
