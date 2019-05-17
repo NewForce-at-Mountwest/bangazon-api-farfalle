@@ -138,7 +138,8 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO PaymentType (AcctNumber, [Name], CustomerId, IsActive)
+                    
+                    cmd.CommandText = $@"INSERT INTO PaymentType (AcctNumber, [Name], CustomerId, IsActive)
                                                     OUTPUT INSERTED.Id
                                                     VALUES (@AcctNumber, @Name, @CustomerId, 1)";
                     cmd.Parameters.Add(new SqlParameter("@AcctNumber", paymentType.AcctNumber));
