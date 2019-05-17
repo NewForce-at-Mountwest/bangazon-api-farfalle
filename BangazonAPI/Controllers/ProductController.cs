@@ -209,9 +209,9 @@ namespace BangazonAPI.Controllers
                         else
                         {
                             cmd.CommandText = @"UPDATE Product SET IsActive = 0 WHERE Id = @id";
-                            cmd.Parameters.Add(new SqlParameter("@id", id));
+                            
                         }
-
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
