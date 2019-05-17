@@ -42,7 +42,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    string commandText = $"SELECT Id, AcctNumber, [Name], CustomerId, IsActive from PaymentType";
+                    string commandText = $"SELECT Id, AcctNumber, [Name], CustomerId, IsActive FROM PaymentType WHERE IsActive = 1";
 
 
 
@@ -193,44 +193,43 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        //    //// DELETE: Code for deleting an exercise
-        //    [HttpDelete("{id}")]
-        //    public async Task<IActionResult> DeletePaymentType([FromRoute] int id)
-        //    {
-        //        try
-        //        {
-        //            using (SqlConnection conn = Connection)
-        //            {
-        //                conn.Open();
-        //                using (SqlCommand cmd = conn.CreateCommand())
-        //                {
-        //                    cmd.CommandText = @"DELETE FROM PaymentType WHERE Id = @id";
-        //                    cmd.Parameters.Add(new SqlParameter("@id", id));
+        //// DELETE: Code for deleting an exercise
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePaymentType([FromRoute] int id)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE PaymentType
+                                            SET isActive = 0
+                                            WHERE id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
-        //                    int rowsAffected = cmd.ExecuteNonQuery();
-        //                    if (rowsAffected > 0)
-        //                    {
-        //                        return new StatusCodeResult(StatusCodes.Status204NoContent);
-        //                    }
-        //                    throw new Exception("No rows affected");
-        //                }
-        //            }
-        //        }
-        //        catch (Exception)
-        //        {
-        //            if (!PaymentTypeExists(id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //    }
-
-
-
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!PaymentTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
 
         private bool PaymentTypeExists(int id)
@@ -240,8 +239,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"
-                                    SELECT Id, name
+                    cmd.CommandText = @"SELECT Id, name
                                     FROM PaymentType
                                     WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
