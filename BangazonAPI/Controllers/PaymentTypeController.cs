@@ -140,11 +140,11 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"INSERT INTO PaymentType (AcctNumber, [Name], CustomerId, IsActive)
                                                     OUTPUT INSERTED.Id
-                                                    VALUES (@AcctNumber, @Name, @CustomerId, @IsActive)";
+                                                    VALUES (@AcctNumber, @Name, @CustomerId, 1)";
                     cmd.Parameters.Add(new SqlParameter("@AcctNumber", paymentType.AcctNumber));
                     cmd.Parameters.Add(new SqlParameter("@Name", paymentType.Name));
                     cmd.Parameters.Add(new SqlParameter("@CustomerId", paymentType.CustomerId));
-                    cmd.Parameters.Add(new SqlParameter("@IsActive", paymentType.IsActive));
+                    
 
 
 
@@ -170,13 +170,12 @@ namespace BangazonAPI.Controllers
                                                         SET AcctNumber = @AcctNumber,
                                                         Name = @Name,
                                                         CustomerId=@CustomerId,
-                                                        isActive = @IsActive
+                                                        isActive = 1
                                                         WHERE id = @id";
 
                         cmd.Parameters.Add(new SqlParameter("@AcctNumber", paymentType.AcctNumber));
                         cmd.Parameters.Add(new SqlParameter("@Name", paymentType.Name));
                         cmd.Parameters.Add(new SqlParameter("@CustomerId", paymentType.CustomerId));
-                        cmd.Parameters.Add(new SqlParameter("@IsActive", paymentType.IsActive));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
