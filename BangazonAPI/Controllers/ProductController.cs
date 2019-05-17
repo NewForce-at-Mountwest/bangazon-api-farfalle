@@ -156,7 +156,7 @@ namespace BangazonAPI.Controllers
                                                 Title = @Title,
                                                 Description = @Description,
                                                 Quantity = @Quantity,
-                                                IsActive = @IsActive
+                                                IsActive = 1
                                             WHERE Id = @id";
                         //make sure we can't put in weird stuff
                         cmd.Parameters.Add(new SqlParameter("@id", Product.Id));
@@ -166,7 +166,7 @@ namespace BangazonAPI.Controllers
                         cmd.Parameters.Add(new SqlParameter("@Title", Product.Title));
                         cmd.Parameters.Add(new SqlParameter("@Description", Product.Description));
                         cmd.Parameters.Add(new SqlParameter("@Quantity", Product.Quantity));
-                        cmd.Parameters.Add(new SqlParameter("@IsActive", Product.IsActive));
+                     
 
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
@@ -202,10 +202,13 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
+
+                        //if you put in the query to HARD DELETE a product, this will do it
                         if (HardDelete == true)
                         {
                             cmd.CommandText = @"DELETE Product Where Id = @id";
                         }
+                        //normal delete just archives it
                         else
                         {
                             cmd.CommandText = @"UPDATE Product SET IsActive = 0 WHERE Id = @id";
