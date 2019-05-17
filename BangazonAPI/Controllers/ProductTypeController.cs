@@ -43,7 +43,7 @@ namespace BangazonAPI.Controllers
                     string command = @"SELECT Id AS 'Product Type Id',
                     Name AS 'Product Type Name',
                     IsActive AS 'Active'
-                    FROM ProductType";
+                    FROM ProductType WHERE IsActive = 1";
    
                     cmd.CommandText = command;
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -111,9 +111,9 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"INSERT INTO ProductType (Name, IsActive)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@Name, IsActive)";
+                                        VALUES (@Name, 1)";
                     cmd.Parameters.Add(new SqlParameter("@Name", ProductType.Name));
-                    cmd.Parameters.Add(new SqlParameter("@IsActive", ProductType.IsActive));
+                  
 
                     int newId = (int)cmd.ExecuteScalar();
                     ProductType.Id = newId;
@@ -134,10 +134,10 @@ namespace BangazonAPI.Controllers
                     {
                         cmd.CommandText = @"UPDATE ProductType
                                             SET Name = @Name,
-                                            IsActive = @IsActive
+                                            IsActive = 1
                                             WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@Name", ProductType.Name));
-                        cmd.Parameters.Add(new SqlParameter("@IsActive", ProductType.IsActive));
+                       
                         cmd.Parameters.Add(new SqlParameter("@id", ProductType.Id));
 
 
@@ -164,7 +164,7 @@ namespace BangazonAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id, bool HardDelete)
         {
             try
             {
@@ -173,7 +173,15 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM ProductType WHERE id = @id";
+                        if (HardDelete == true)
+                        {
+                            cmd.CommandText = @"DELETE FROM ProductType WHERE id = @id";
+                            
+                        }
+
+                        else { cmd.CommandText = @"UPDATE                                   ProductType                                SET IsActive = 0
+                                            WHERE Id = @id"; }
+
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();

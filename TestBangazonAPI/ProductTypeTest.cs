@@ -46,7 +46,7 @@ namespace TestStudentExerciseUsingAPI
         // Delete a ProductType in the database and make sure we get a no content status code back
         public async Task deleteTable(ProductType Table, HttpClient client)
         {
-            HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/ProductType/{Table.Id}");
+            HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/ProductType/{Table.Id}?HardDelete=true");
             deleteResponse.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
