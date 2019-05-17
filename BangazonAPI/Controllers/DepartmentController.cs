@@ -42,7 +42,7 @@ namespace BangazonAPI.Controllers
 
         //GET:Code for getting a list of Departments which are ACTIVE in the system
         [HttpGet]
-        public async Task<IActionResult> GetAllDepartments(string include)
+        public async Task<IActionResult> GetAllDepartments(string _include, string _filter, int _gt)
         {
 
             using (SqlConnection conn = Connection)
@@ -52,6 +52,11 @@ namespace BangazonAPI.Controllers
                 {
                     string commandText = $"SELECT d.Id as 'DepartmentId', d.[Name] AS 'Department Name', d.Budget, e.id as 'EmployeeId', e.FirstName as 'Employee FirstName', e.LastName as 'Employee lastName', e.IsSuperVisor FROM Department d Full JOIN Employee e on d.id = e.departmentId";
 
+                    if (_filter == "budget")
+                    {
+                        commandText+= $" WHERE d.budget > '{_gt}'"; 
+
+                    }
                     
 
                     cmd.CommandText = commandText;
@@ -86,7 +91,7 @@ namespace BangazonAPI.Controllers
                         if (departments.Any(d => d.Id == department.Id))
                         {
                             Department departmentOnList = departments.Where(d => d.Id == department.Id).FirstOrDefault();
-                            if (include == "employees")
+                            if (_include == "employees")
                             {                               
 
                                 if (!departmentOnList.Employees.Any(e => e.Id == employee.Id))
@@ -94,14 +99,13 @@ namespace BangazonAPI.Controllers
                                     departmentOnList.Employees.Add(employee);
 
                                 }
-                            }
-                           
+                            }                           
 
                         }
                         else
                         {
 
-                            if (include == "employees") {
+                            if (_include == "employees") {
                                 department.Employees.Add(employee);
                                 }
 
