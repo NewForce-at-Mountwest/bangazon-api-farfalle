@@ -41,7 +41,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    string command = "SELECT p.Id AS 'Product Id', p.ProductTypeId, p.CustomerId, p.Price, p.Title, p.Description, p.Quantity, p.CustomerId, p.IsActive FROM Product p";
+                    string command = "SELECT p.Id AS 'Product Id', p.ProductTypeId, p.CustomerId, p.Price, p.Title, p.Description, p.Quantity, p.CustomerId, p.IsActive FROM Product p WHERE p.IsActive = 1";
                     cmd.CommandText = command;
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Product> Products = new List<Product>();
@@ -122,7 +122,7 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, Description, Quantity, isActive)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@ProductTypeId, @CustomerId, @Price, @Title, @Description, @Quantity, @IsActive)";
+                                        VALUES (@ProductTypeId, @CustomerId, @Price, @Title, @Description, @Quantity, 1)";
                     //HOPEFULLY prevent people from doing funky stuff to our db when they post a product
                     cmd.Parameters.Add(new SqlParameter("@ProductTypeId", Product.ProductTypeId));
                     cmd.Parameters.Add(new SqlParameter("@CustomerId", Product.CustomerId));
@@ -130,7 +130,7 @@ namespace BangazonAPI.Controllers
                     cmd.Parameters.Add(new SqlParameter("@Title", Product.Title));
                     cmd.Parameters.Add(new SqlParameter("@Description", Product.Description));
                     cmd.Parameters.Add(new SqlParameter("@Quantity", Product.Quantity));
-                    cmd.Parameters.Add(new SqlParameter("@IsActive", Product.IsActive));
+                  
 
                     int newId = (int)cmd.ExecuteScalar();
                     Product.Id = newId;
@@ -202,7 +202,7 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM Product WHERE Id = @id";
+                        cmd.CommandText = @"UPDATE Product SET IsActive = 0 WHERE Id = @id";                   
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();

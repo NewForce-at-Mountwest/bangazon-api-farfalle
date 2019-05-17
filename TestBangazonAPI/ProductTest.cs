@@ -28,7 +28,7 @@ namespace TestStudentExerciseUsingAPI
                 Description = "It's a bandana that looks like a banana...somehow.",
                 Quantity = 100,
                 IsActive = true
-    };
+            };
             //turn the product into json
             string BananaAsJSON = JsonConvert.SerializeObject(Banana);
 
