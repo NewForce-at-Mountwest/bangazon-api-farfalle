@@ -54,7 +54,7 @@ namespace BangazonAPI.Controllers
 
                     if (_filter == "budget")
                     {
-                        commandText+= $" WHERE d.budget > '{_gt}'"; 
+                        commandText+= $" WHERE d.budget >= '{_gt}'"; 
 
                     }                   
 
