@@ -66,10 +66,8 @@ namespace BangazonAPI.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
-                            DecommissionDate = reader.GetDateTime(reader.GetOrdinal("DecommissionDate")),
                             Make = reader.GetString(reader.GetOrdinal("Make")),
                             Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
-
                         };
 
 
@@ -109,23 +107,21 @@ namespace BangazonAPI.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
-                                DecommissionDate = reader.GetDateTime(reader.GetOrdinal("DecommissionDate")),
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
 
                             };
 
-                            //Check to see if the decommission date is null.  If not, add it to the object
+                            //Check to see if the decommission date is null.If not, add it to the object.  If it is, set the Decommission Date to null on the object.
 
-                            //if (!reader.IsDBNull(reader.GetOrdinal("DecommissionDate")))
-                            //{
-                            //    computerToDisplay.DecommissionDate = reader.GetDateTime(reader.GetOrdinal("DecommissionDate"));
-                            //}
-                            //else
-                            //    computerToDisplay.DecommissionDate = null;
-                            //{
-
-                            //}
+                            if (!reader.IsDBNull(reader.GetOrdinal("DecommissionDate")))
+                            {
+                                computerToDisplay.DecommissionDate = reader.GetDateTime(reader.GetOrdinal("DecommissionDate"));
+                            }
+                            else
+                            { 
+                                computerToDisplay.DecommissionDate = DateTime.MinValue;
+                            }
                         };
                     };
 
@@ -137,32 +133,31 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        ////  POST: Code for creating a computer
-        //[HttpPost]
-        //public async Task<IActionResult> Computer([FromBody] Computer computer)
-        //{
-        //    using (SqlConnection conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (SqlCommand cmd = conn.CreateCommand())
-        //        {
+        //  POST: Code for creating a computer
+        [HttpPost]
+        public async Task<IActionResult> Computer([FromBody] Computer computer)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
 
-        //            cmd.CommandText = $@"INSERT INTO Computer (AcctNumber, [Name], CustomerId, IsActive)
-        //                                            OUTPUT INSERTED.Id
-        //                                            VALUES (@AcctNumber, @Name, @CustomerId, 1)";
-        //            cmd.Parameters.Add(new SqlParameter("@AcctNumber", computer.AcctNumber));
-        //            cmd.Parameters.Add(new SqlParameter("@Name", computer.Name));
-        //            cmd.Parameters.Add(new SqlParameter("@CustomerId", computer.CustomerId));
+                    cmd.CommandText = $@"INSERT INTO Computer (PurchaseDate, DecommissionDate, Make, Manufacturer)
+                                                    OUTPUT INSERTED.Id
+                                                    VALUES (@PurchaseDate, Null, @Make, @Manufacturer)";
+                    cmd.Parameters.Add(new SqlParameter("@PurchaseDate", computer.PurchaseDate));
+                    cmd.Parameters.Add(new SqlParameter("@Make", computer.Make));
+                    cmd.Parameters.Add(new SqlParameter("@Manufacturer", computer.Manufacturer));
 
+                    int newId = (int)cmd.ExecuteScalar();
+                    computer.Id = newId;
+                    computer.DecommissionDate = DateTime.MinValue;
 
-
-
-        //            int newId = (int)cmd.ExecuteScalar();
-        //            computer.Id = newId;
-        //            return CreatedAtRoute("Computer", new { id = newId }, computer);
-        //        }
-        //    }
-        //}
+                    return CreatedAtRoute("Computer", new { id = newId }, computer);
+                }
+            }
+        }
 
         //// PUT: Code for editing a computer
         //[HttpPut("{id}")]
