@@ -124,19 +124,42 @@ namespace BangazonAPI.Controllers
 
 
 
-
-
-
-
-
-
-
-        // GET: api/TrainingProgram/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        [HttpGet("{id}", Name = "GetTrainingProgram")]
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
-            return "value";
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, Name, StartDate, EndDate, MaxAttendees FROM TrainingProgram WHERE Id = @id";
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Customer customer = null;
+
+                    if (reader.Read())
+                    {
+                        customer = new Customer
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                        };
+
+                    }
+                    reader.Close();
+                    return Ok(customer);
+                }
+            }
         }
+
+
+
+
+
+
 
         // POST: api/TrainingProgram
         [HttpPost]
