@@ -73,6 +73,9 @@ namespace BangazonAPI.Controllers
                     {
                         command = $"{command}{searchTable}";
                         
+                    } else
+                    {
+                        command = command;
                     }
 
                     cmd.CommandText = command;
@@ -91,15 +94,6 @@ namespace BangazonAPI.Controllers
                                 PaymentTypes = new List<PaymentType>()
                             };
 
-
-
-                            if(q != null)
-                        {
-                            if(!customers.Any(x => x.Id == customer.Id))
-                            {
-                                customers.Add(customer);
-                            }
-                        }
 
 
 
@@ -163,9 +157,14 @@ namespace BangazonAPI.Controllers
                             }
 
 
-
-                            
+                        if(!customers.Any(x => x.Id == customer.Id))
+                        {
+                            customers.Add(customer);
                         }
+
+
+
+                    }
                         reader.Close();
                         return Ok(customers);
                     }
@@ -183,7 +182,7 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"SELECT Id, FirstName, LastName,  FROM Customer WHERE Id = @id";
+                        cmd.CommandText = @"SELECT Id, FirstName, LastName FROM Customer WHERE Id = @id";
 
                         cmd.Parameters.Add(new SqlParameter("@id", id));
                         SqlDataReader reader = cmd.ExecuteReader();
