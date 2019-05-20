@@ -224,9 +224,9 @@ namespace BangazonAPI.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"UPDATE Department
-                                           SET AcctNumber = @AcctNumber,
-                                           Name = @Name,
-                                           Budget = @Budget";
+                                           SET name = @Name,
+                                           Budget = @Budget
+                                           WHERE id = @id";
 
 
                         cmd.Parameters.Add(new SqlParameter("@Name", department.Name));
@@ -254,6 +254,50 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
+        // DELETE: Code for deleting a payment type--soft delete actually changes 'isActive' to 0 (false)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDepartment([FromRoute] int id, string q)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+
+                        if (q == "delete_test_item")
+                        {
+                            cmd.CommandText = @"DELETE Department
+                                              WHERE id = @id";
+                        }
+                       
+
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!DepartmentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+
 
 
 

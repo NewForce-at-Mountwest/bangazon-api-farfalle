@@ -54,7 +54,7 @@ namespace TestBangazonAPI
         // Delete a department in the database and make sure we get a no content status code back
         public async Task deleteDepartment(Department department, HttpClient client)
         {
-            HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/department/{department.Id}?");
+            HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/department/{department.Id}?q=delete_test_item");
             deleteResponse.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
@@ -184,7 +184,7 @@ namespace TestBangazonAPI
                 Department newDepartment = await createDepartment(client);
 
                 // Try to get that department from the database
-                HttpResponseMessage response = await client.GetAsync($"api/department/{newDepartment.Id}/_include=employees");
+                HttpResponseMessage response = await client.GetAsync($"api/department/{newDepartment.Id}?_include=employees");
 
                 response.EnsureSuccessStatusCode();
 
@@ -220,7 +220,7 @@ namespace TestBangazonAPI
 
 
         [Fact]
-        public async Task Test_Create_And_Delete_Department()
+        public async Task Test_Create_Department()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -238,17 +238,7 @@ namespace TestBangazonAPI
             }
         }
 
-        [Fact]
-        public async Task Test_Delete_NonExistent_Department_Fails()
-        {
-            using (var client = new APIClientProvider().Client)
-            {
-                // Try to delete an Id that shouldn't exist in the DB
-                HttpResponseMessage deleteResponse = await client.DeleteAsync("/api/department/600000");
-                Assert.False(deleteResponse.IsSuccessStatusCode);
-                Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
-            }
-        }
+      
 
         [Fact]
         public async Task Test_Modify_Department()
