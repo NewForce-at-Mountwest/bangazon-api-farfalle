@@ -77,7 +77,8 @@ namespace BangazonAPI.Controllers
 
                         DateTime now = DateTime.Now;
                         
-
+                        //Checks that each item in the list is in the future,
+                        //then checks to see if that item is in the list before adding it or employees to it
                         if (completed == "false")
                         {
                             if (!(DateTime.Compare(trainingProgram.EndDate, now) < 0))
@@ -97,6 +98,7 @@ namespace BangazonAPI.Controllers
                                 }
                             }
                         } else
+                        //if item in the list is in the past - checks to see if it is already in the list - adds it if not, adds the employees to the existing one if it is
                         {
                             if (trainingPrograms.Any(x => x.Id == trainingProgram.Id))
                             {
