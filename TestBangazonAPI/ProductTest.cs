@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
-using TestBangazonAPI;
 
 namespace TestBangazonAPI
 {
