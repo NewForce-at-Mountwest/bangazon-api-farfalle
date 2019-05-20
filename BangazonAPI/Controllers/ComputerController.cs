@@ -145,7 +145,7 @@ namespace BangazonAPI.Controllers
 
                     cmd.CommandText = $@"INSERT INTO Computer (PurchaseDate, DecommissionDate, Make, Manufacturer)
                                                     OUTPUT INSERTED.Id
-                                                    VALUES (@PurchaseDate, Null, @Make, @Manufacturer)";
+                                                    VALUES (@PurchaseDate, Null, @Make,          @Manufacturer)";
                     cmd.Parameters.Add(new SqlParameter("@PurchaseDate", computer.PurchaseDate));
                     cmd.Parameters.Add(new SqlParameter("@Make", computer.Make));
                     cmd.Parameters.Add(new SqlParameter("@Manufacturer", computer.Manufacturer));
@@ -204,52 +204,57 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        //// DELETE: Code for deleting a payment type--soft delete actually changes 'isActive' to 0 (false)
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> Computer([FromRoute] int id, bool HardDelete)
-        //{
-        //    try
-        //    {
-        //        using (SqlConnection conn = Connection)
-        //        {
-        //            conn.Open();
-        //            using (SqlCommand cmd = conn.CreateCommand())
-        //            {
+        // DELETE: Code for deleting a payment type--soft delete actually changes Deocmmission date to a non-null value
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Computer([FromRoute] int id, bool HardDelete)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
 
-        //                if (HardDelete == true)
-        //                {
-        //                    cmd.CommandText = @"DELETE Computer
-        //                                      WHERE id = @id";
-        //                }
-        //                else
-        //                {
-        //                    cmd.CommandText = @"UPDATE Computer
-        //                                    SET isActive = 0
-        //                                    WHERE id = @id";
-        //                }
+                        if (HardDelete == true)
+                        {
+                            cmd.CommandText = @"DELETE Computer
+                                              WHERE id = @id";
+                        }
+                        else
+                        {
+                            cmd.CommandText = @"UPDATE Computer
+                                            SET DecommissionDate = @currentDate
+                                            WHERE id = @id";
+                        }
 
-        //                cmd.Parameters.Add(new SqlParameter("@id", id));
-        //                int rowsAffected = cmd.ExecuteNonQuery();
-        //                if (rowsAffected > 0)
-        //                {
-        //                    return new StatusCodeResult(StatusCodes.Status204NoContent);
-        //                }
-        //                throw new Exception("No rows affected");
-        //            }
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        if (!ComputerExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-        //}
+                        //Set the current date to today
+                        DateTime currentDate = DateTime.Now;                            
+
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@currentDate", currentDate));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ComputerExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
 
         private bool ComputerExists(int id)
