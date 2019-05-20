@@ -38,6 +38,9 @@ namespace BangazonAPI.Controllers
 
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
+
+                    //SqlCommands dependant on query strings
+
                         string command = "";
                         string customerColumns = @"SELECT Customer.Id, Customer.FirstName, Customer.LastName";
 
@@ -52,6 +55,8 @@ namespace BangazonAPI.Controllers
                         string productTable = " JOIN Product ON Product.CustomerId = Customer.Id";
 
                         string searchTable = $" WHERE Customer.FirstName LIKE '%{q}%' OR Customer.LastName LIKE '%{q}%'";
+
+                        //Conditionals for query strings
 
                         if (include == "paymentTypes")
                         {
@@ -108,6 +113,8 @@ namespace BangazonAPI.Controllers
                                     IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
                                 };
 
+                                //If customer is already in the list, adds only the payment type, otherwise adds the payment type and the customer
+
                                 if (customers.Any(x => x.Id == customer.Id))
                                 {
                                     Customer currentCustomer = customers.Where(x => x.Id == customer.Id).FirstOrDefault();
@@ -131,7 +138,9 @@ namespace BangazonAPI.Controllers
                                 }
                             }
 
-                            if(include == "products")
+                        //If customer is already in the list, adds only the product, otherwise adds the product and the customer
+
+                        if (include == "products")
                             {
                                 Product product = new Product()
                                 {
@@ -156,6 +165,7 @@ namespace BangazonAPI.Controllers
                                 }
                             }
 
+                        //Adds customer to list if it is missing if an include is NotFiniteNumberException used
 
                         if(!customers.Any(x => x.Id == customer.Id))
                         {
