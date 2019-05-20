@@ -159,50 +159,50 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        //// PUT: Code for editing a computer
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Computer([FromRoute] int id, [FromBody] Computer computer)
-        //{
-        //    try
-        //    {
-        //        using (SqlConnection conn = Connection)
-        //        {
-        //            conn.Open();
-        //            using (SqlCommand cmd = conn.CreateCommand())
-        //            {
-        //                cmd.CommandText = @"UPDATE Computer
-        //                                                SET AcctNumber = @AcctNumber,
-        //                                                Name = @Name,
-        //                                                CustomerId=@CustomerId,
-        //                                                isActive = 1
-        //                                                WHERE id = @id";
+        // PUT: Code for editing a computer
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutComputer([FromRoute] int id, [FromBody] Computer computer)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Computer
+                                                        SET PurchaseDate = @PurchaseDate,
+                                                        DecommissionDate = Null,
+                                                        Make=@Make,
+                                                        Manufacturer = @Manufacturer
+                                                        WHERE id = @id";
 
-        //                cmd.Parameters.Add(new SqlParameter("@AcctNumber", computer.AcctNumber));
-        //                cmd.Parameters.Add(new SqlParameter("@Name", computer.Name));
-        //                cmd.Parameters.Add(new SqlParameter("@CustomerId", computer.CustomerId));
-        //                cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@PurchaseDate", computer.PurchaseDate));
+                        cmd.Parameters.Add(new SqlParameter("@Make", computer.Make));
+                        cmd.Parameters.Add(new SqlParameter("@Manufacturer", computer.Manufacturer));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
-        //                int rowsAffected = cmd.ExecuteNonQuery();
-        //                if (rowsAffected > 0)
-        //                {
-        //                    return new StatusCodeResult(StatusCodes.Status204NoContent);
-        //                }
-        //                throw new Exception("No rows affected");
-        //            }
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        if (!ComputerExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-        //}
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ComputerExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
         //// DELETE: Code for deleting a payment type--soft delete actually changes 'isActive' to 0 (false)
         //[HttpDelete("{id}")]
@@ -252,23 +252,23 @@ namespace BangazonAPI.Controllers
         //}
 
 
-        //private bool ComputerExists(int id)
-        //{
-        //    using (SqlConnection conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (SqlCommand cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"SELECT Id, name
-        //                            FROM Computer
-        //                            WHERE Id = @id";
-        //            cmd.Parameters.Add(new SqlParameter("@id", id));
+        private bool ComputerExists(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, Make
+                                    FROM Computer
+                                    WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
 
-        //            SqlDataReader reader = cmd.ExecuteReader();
-        //            return reader.Read();
-        //        }
-        //    }
-        //}
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
+                }
+            }
+        }
 
 
     }
