@@ -113,6 +113,103 @@ namespace TestBangazonAPI
         }
 
         [Fact]
+        public async Task Test_Include_products()
+        {
+
+            using (HttpClient client = new APIClientProvider().Client)
+            {
+
+                // Create a new student
+                Customer newDavid = await createDavid(client);
+
+                // Try to get that student from the database
+                HttpResponseMessage response = await client.GetAsync($"api/customer/{newDavid.Id}/?include=products");
+
+                response.EnsureSuccessStatusCode();
+
+                // Turn the response into JSON
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // Turn the JSON into C#
+                Customer customer = JsonConvert.DeserializeObject<Customer>(responseBody);
+
+                // Did we get back what we expected to get back? 
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("David", newDavid.FirstName);
+                Assert.Equal("Bird", newDavid.LastName);
+                Assert.NotNull(newDavid.Products);
+
+                // Clean up after ourselves- delete david!
+                deleteDavid(newDavid, client);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Include_Query_payment()
+        {
+
+            using (HttpClient client = new APIClientProvider().Client)
+            {
+
+                // Create a new student
+                Customer newDavid = await createDavid(client);
+
+                // Try to get that student from the database
+                HttpResponseMessage response = await client.GetAsync($"api/customer/{newDavid.Id}/?include=paymentTypes");
+
+                response.EnsureSuccessStatusCode();
+
+                // Turn the response into JSON
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // Turn the JSON into C#
+                Customer customer = JsonConvert.DeserializeObject<Customer>(responseBody);
+
+                // Did we get back what we expected to get back? 
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("David", newDavid.FirstName);
+                Assert.Equal("Bird", newDavid.LastName);
+                Assert.NotNull(newDavid.PaymentTypes);
+
+                // Clean up after ourselves- delete david!
+                deleteDavid(newDavid, client);
+            }
+        }
+
+
+        [Fact]
+        public async Task Test_Query_String_q()
+        {
+
+            using (HttpClient client = new APIClientProvider().Client)
+            {
+
+                // Create a new student
+                Customer newDavid = await createDavid(client);
+
+                // Try to get that student from the database
+                HttpResponseMessage response = await client.GetAsync($"api/customer/{newDavid.Id}/?q=david");
+
+                response.EnsureSuccessStatusCode();
+
+                // Turn the response into JSON
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // Turn the JSON into C#
+                Customer customer = JsonConvert.DeserializeObject<Customer>(responseBody);
+
+                // Did we get back what we expected to get back? 
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("David", newDavid.FirstName);
+                Assert.Equal("Bird", newDavid.LastName);
+
+                // Clean up after ourselves- delete david!
+                deleteDavid(newDavid, client);
+            }
+        }
+
+
+        [Fact]
         public async Task Test_Get_NonExitant_Customer_Fails()
         {
 

@@ -3,7 +3,9 @@ using BangazonAPI;
 using System.Net.Http;
 using Xunit;
 
+
 namespace TestBangazonAPI
+
 {
     class APIClientProvider : IClassFixture<WebApplicationFactory<Startup>>
     {
@@ -21,7 +23,4 @@ namespace TestBangazonAPI
             Client?.Dispose();
         }
     }
-
 }
-
-
