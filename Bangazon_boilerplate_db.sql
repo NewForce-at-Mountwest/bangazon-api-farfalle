@@ -58,7 +58,7 @@ CREATE TABLE Employee (
 CREATE TABLE Computer (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	PurchaseDate DATETIME NOT NULL,
-	DecommissionDate DATETIME,
+	DecomissionDate DATETIME,
 	Make VARCHAR(55) NOT NULL,
 	Manufacturer VARCHAR(55) NOT NULL
 );
@@ -150,9 +150,9 @@ INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor) VALUES ('
 INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor) VALUES ('Jacob', 'Turner', 2, 0);
 INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor) VALUES ('Dwayne', 'Johnson', 3, 1);
 
-INSERT INTO Computer (PurchaseDate, DecommissionDate, Make, Manufacturer) VALUES ('12/07/2018', '3/04/2019', 'Laptop', 'DELL');
-INSERT INTO Computer (PurchaseDate, DecommissionDate, Make, Manufacturer) VALUES ('01/05/2017', null, 'Laptop', 'IBM');
-INSERT INTO Computer (PurchaseDate, DecommissionDate, Make, Manufacturer) VALUES ('12/17/2016', '05/09/2019', 'Laptop', 'DELL');
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) VALUES ('12/07/2018', '3/04/2019', 'Laptop', 'DELL');
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) VALUES ('01/05/2017', null, 'Laptop', 'IBM');
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) VALUES ('12/17/2016', '05/09/2019', 'Laptop', 'DELL');
 
 INSERT  INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (1, 2, '01/05/2017', null);
 INSERT  INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (2, 3, '02/13/2018', '07/19/2019');
