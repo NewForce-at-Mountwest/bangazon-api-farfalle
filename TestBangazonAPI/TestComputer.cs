@@ -28,7 +28,7 @@ namespace TestBangazonAPI
             Computer computer = new Computer
             {
                 PurchaseDate = new DateTime (2019,05,13),
-                DecommissionDate = DateTime.MinValue,
+                DecomissionDate = DateTime.MinValue,
                 Make = "Test Computer",
                 Manufacturer = "Dell"
 

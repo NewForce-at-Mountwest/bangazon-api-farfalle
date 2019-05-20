@@ -1,6 +1,6 @@
 ﻿//**********************************************************************************************//
 // This Controller gives the client access to getAll, getSingle, Post, Put, and Delete 
-// (soft delete updates the decommission date to a non-null value)
+// (soft delete updates the decomission date to a non-null value)
 // on the Computer Resource.  It does not support query functionality at this point.
 // Created by Sydney Wait
 //*********************************************************************************************//
@@ -51,7 +51,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    string commandText = $"SELECT Id, PurchaseDate, Make, Manufacturer FROM Computer WHERE DecommissionDate IS NULL";
+                    string commandText = $"SELECT Id, PurchaseDate, Make, Manufacturer FROM Computer WHERE DecomissionDate IS NULL";
 
                     cmd.CommandText = commandText;
 
@@ -93,7 +93,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"SELECT Id, PurchaseDate, Make, Manufacturer, DecommissionDate FROM Computer WHERE id = @id";
+                    cmd.CommandText = $"SELECT Id, PurchaseDate, Make, Manufacturer, DecomissionDate FROM Computer WHERE id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -112,15 +112,15 @@ namespace BangazonAPI.Controllers
 
                             };
 
-                            //Check to see if the decommission date is null.If not, add it to the object.  If it is, set the Decommission Date to null on the object.
+                            //Check to see if the decomission date is null.If not, add it to the object.  If it is, set the Decomission Date to null on the object.
 
-                            if (!reader.IsDBNull(reader.GetOrdinal("DecommissionDate")))
+                            if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
                             {
-                                computerToDisplay.DecommissionDate = reader.GetDateTime(reader.GetOrdinal("DecommissionDate"));
+                                computerToDisplay.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
                             }
                             else
                             { 
-                                computerToDisplay.DecommissionDate = DateTime.MinValue;
+                                computerToDisplay.DecomissionDate = DateTime.MinValue;
                             }
                         };
                     };
@@ -143,7 +143,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
 
-                    cmd.CommandText = $@"INSERT INTO Computer (PurchaseDate, DecommissionDate, Make, Manufacturer)
+                    cmd.CommandText = $@"INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer)
                                                     OUTPUT INSERTED.Id
                                                     VALUES (@PurchaseDate, Null, @Make,          @Manufacturer)";
                     cmd.Parameters.Add(new SqlParameter("@PurchaseDate", computer.PurchaseDate));
@@ -152,7 +152,7 @@ namespace BangazonAPI.Controllers
 
                     int newId = (int)cmd.ExecuteScalar();
                     computer.Id = newId;
-                    computer.DecommissionDate = DateTime.MinValue;
+                    computer.DecomissionDate = DateTime.MinValue;
 
                     return CreatedAtRoute("Computer", new { id = newId }, computer);
                 }
@@ -172,7 +172,7 @@ namespace BangazonAPI.Controllers
                     {
                         cmd.CommandText = @"UPDATE Computer
                                                         SET PurchaseDate = @PurchaseDate,
-                                                        DecommissionDate = Null,
+                                                        DecomissionDate = Null,
                                                         Make=@Make,
                                                         Manufacturer = @Manufacturer
                                                         WHERE id = @id";
@@ -224,7 +224,7 @@ namespace BangazonAPI.Controllers
                         else
                         {
                             cmd.CommandText = @"UPDATE Computer
-                                            SET DecommissionDate = @currentDate
+                                            SET DecomissionDate = @currentDate
                                             WHERE id = @id";
                         }
 
