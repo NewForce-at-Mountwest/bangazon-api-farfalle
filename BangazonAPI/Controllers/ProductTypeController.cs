@@ -9,6 +9,9 @@ using System.Data.SqlClient;
 using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
 
+//This is the controller to allow the client to access read, update, and create productTypes. It has two delete functionalities; normal delete will archive the product by setting the isActive property to false, and the query string HardDelete=true will trigger a hard delete
+
+//developed by: connor fitzgerald
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
