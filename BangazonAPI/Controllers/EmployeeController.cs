@@ -76,15 +76,16 @@ namespace BangazonAPI.Controllers
                                 PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
                                
                             }
-                        };
+                            
+                    };
 
-                    //    if (!reader.IsDBNull(GetOrdinal("DecomissionDate")))
-                    //    {
-                    //        employee.CurrentComputer.DecommissionDate = reader.GetDateTime(GetOrdinal("DecomissionDate"))
 
-                    //};
-                        
 
+                        if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                        {
+                            employee.CurrentComputer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
+
+                    };
 
 
 
