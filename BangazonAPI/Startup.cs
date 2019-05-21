@@ -41,6 +41,14 @@ namespace BangazonAPI
                 app.UseHsts();
             }
 
+            // UseCors with CorsPolicyBuilder. Prohibits access from domains other than localHost 8080
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("https://localhost:8080", 
+                    "https://localhost:8080"
+                    );
+            });
+
             app.UseHttpsRedirection();
             app.UseMvc();
         }
