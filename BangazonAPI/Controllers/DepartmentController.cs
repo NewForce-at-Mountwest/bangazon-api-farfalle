@@ -22,6 +22,10 @@ namespace BangazonAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+
+    ///<summary>
+    ///This controller allows Get, Post, Put and Delete Methods
+    ///</summary>
     public class DepartmentController : ControllerBase
     {
         private readonly IConfiguration _config;
@@ -40,7 +44,9 @@ namespace BangazonAPI.Controllers
         }
 
 
-        //GET:Code for getting a list of Departments which are ACTIVE in the system
+        ///<summary>GET:Code for getting a list of Departments 
+        ///which are ACTIVE in the system
+        ///</summary>
         [HttpGet]
         public async Task<IActionResult> GetAllDepartments(string _include, string _filter, int _gt)
         {
@@ -79,7 +85,7 @@ namespace BangazonAPI.Controllers
 
                         };
 
-                        //Check first to see if this line on the table has an employee in it so the code doesn't throw an error
+                        ///<remark>Check first to see if this line on the table has an employee in it so the code doesn't throw an error</remark>
                         if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId"))) {
                             employee = new Employee
                             {
@@ -129,7 +135,7 @@ namespace BangazonAPI.Controllers
 
 
 
-        //GET: Code for getting a single department (active or not)
+        ///<summary>GET: Code for getting a single department (active or not)</summary>
         [HttpGet("{id}", Name = "Department")]
         public async Task<IActionResult> GetSingleDepartment([FromRoute] int id, string _include)
         {
@@ -190,7 +196,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        //  POST: Code for creating a department
+        ///<summary>  POST: Code for creating a department</summary>
         [HttpPost]
         public async Task<IActionResult> PostDepartment([FromBody] Department department)
         {
@@ -212,7 +218,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // PUT: Code for editing a department
+        ///<summary> PUT: Code for editing a department</summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDepartment([FromRoute] int id, [FromBody] Department department)
         {
@@ -255,8 +261,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // DELETE: Code for deleting a payment type--soft delete actually changes 'isActive' to 0 (false)
-        [HttpDelete("{id}")]
+        ///<summary> DELETE: Code for deleting a payment type--soft delete actually changes 'isActive' to 0 (false) </summary>
+[HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDepartment([FromRoute] int id, string q)
         {
             try
@@ -300,7 +306,11 @@ namespace BangazonAPI.Controllers
 
 
 
-
+        /// <summary>
+        /// Checks to see if a Department exists before running additional methods
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         private bool DepartmentExists(int id)
         {
             using (SqlConnection conn = Connection)

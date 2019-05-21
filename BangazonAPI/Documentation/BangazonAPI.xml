@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BangazonAPI</name>
+    </assembly>
+    <members>
+        <member name="M:BangazonAPI.Controllers.DepartmentController.GetAllDepartments(System.String,System.String,System.Int32)">
+            <summary>GET:Code for getting a list of Departments 
+            which are ACTIVE in the system
+            </summary>
+        </member>
+        <member name="M:BangazonAPI.Controllers.DepartmentController.GetSingleDepartment(System.Int32,System.String)">
+            <summary>GET: Code for getting a single department (active or not)</summary>
+        </member>
+        <member name="M:BangazonAPI.Controllers.DepartmentController.PostDepartment(BangazonAPI.Models.Department)">
+            <summary>  POST: Code for creating a department</summary>
+        </member>
+        <member name="M:BangazonAPI.Controllers.DepartmentController.PutDepartment(System.Int32,BangazonAPI.Models.Department)">
+            <summary> PUT: Code for editing a department</summary>
+        </member>
+        <member name="M:BangazonAPI.Controllers.DepartmentController.DeleteDepartment(System.Int32,System.String)">
+            <summary> DELETE: Code for deleting a payment type--soft delete actually changes 'isActive' to 0 (false) </summary>
+        </member>
+        <member name="M:BangazonAPI.Controllers.DepartmentController.DepartmentExists(System.Int32)">
+            <summary>
+            Checks to see if a Department exists before running additional methods
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
