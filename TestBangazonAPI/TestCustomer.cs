@@ -123,7 +123,7 @@ namespace TestBangazonAPI
                 Customer newDavid = await createDavid(client);
 
                 // Try to get that student from the database
-                HttpResponseMessage response = await client.GetAsync($"api/customer/{newDavid.Id}/?include=products");
+                HttpResponseMessage response = await client.GetAsync($"api/customer/?include=products");
 
                 response.EnsureSuccessStatusCode();
 
@@ -131,13 +131,44 @@ namespace TestBangazonAPI
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Turn the JSON into C#
-                Customer customer = JsonConvert.DeserializeObject<Customer>(responseBody);
-
+                List<Customer> customerList = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
                 // Did we get back what we expected to get back? 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal("David", newDavid.FirstName);
-                Assert.Equal("Bird", newDavid.LastName);
-                Assert.NotNull(newDavid.Products);
+                
+
+                // Clean up after ourselves- delete david!
+                deleteDavid(newDavid, client);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Get_Inactive_Customers()
+        {
+
+            using (HttpClient client = new APIClientProvider().Client)
+            {
+
+                // Create a new customer
+                Customer newDavid = await createDavid(client);
+
+                // Try to get that customer from the database
+                HttpResponseMessage response = await client.GetAsync($"api/customer/?active=false");
+
+                // Make sure that a response comes back at all
+                response.EnsureSuccessStatusCode();
+
+                // Read the response body as JSON
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // Convert the JSON to a list of customer instances
+                List<Customer> customerList = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+
+                // Did we get back a 200 OK status code?
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                // Are there any customers in the list?
+                Assert.True(customerList.Count > 0);
+
 
                 // Clean up after ourselves- delete david!
                 deleteDavid(newDavid, client);
@@ -155,7 +186,7 @@ namespace TestBangazonAPI
                 Customer newDavid = await createDavid(client);
 
                 // Try to get that student from the database
-                HttpResponseMessage response = await client.GetAsync($"api/customer/{newDavid.Id}/?include=paymentTypes");
+                HttpResponseMessage response = await client.GetAsync($"api/customer/?include=paymentTypes");
 
                 response.EnsureSuccessStatusCode();
 
@@ -163,13 +194,10 @@ namespace TestBangazonAPI
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Turn the JSON into C#
-                Customer customer = JsonConvert.DeserializeObject<Customer>(responseBody);
-
+                List<Customer> customerList = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
                 // Did we get back what we expected to get back? 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal("David", newDavid.FirstName);
-                Assert.Equal("Bird", newDavid.LastName);
-                Assert.NotNull(newDavid.PaymentTypes);
+                
 
                 // Clean up after ourselves- delete david!
                 deleteDavid(newDavid, client);
