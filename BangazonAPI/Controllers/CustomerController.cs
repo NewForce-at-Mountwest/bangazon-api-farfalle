@@ -54,7 +54,7 @@ namespace BangazonAPI.Controllers
 
                         string productTable = " JOIN Product ON Product.CustomerId = Customer.Id";
 
-                        string searchTable = $" WHERE Customer.FirstName LIKE '%{q}%' OR Customer.LastName LIKE '%{q}%'";
+                        string searchTable = $" Customer.FirstName LIKE '%{q}%' OR Customer.LastName LIKE '%{q}%'";
 
                         string orderColumns = $", o.id as 'orderId'";
                         string orderTable = " LEFT JOIN [Order] o ON o.CustomerId = Customer.id WHERE o.id IS NULL";
@@ -83,11 +83,15 @@ namespace BangazonAPI.Controllers
                         
                         }
 
-                         if (q != null)
+                         if (q != null && active != "false")
                         {
-                        command += $"{command}{searchTable}";
+                        command += $" WHERE{searchTable}";
                         
                         } 
+                         else if(q!= null)
+                        {
+                        command += $" AND{searchTable}";
+                        }
                                     
                    
 
