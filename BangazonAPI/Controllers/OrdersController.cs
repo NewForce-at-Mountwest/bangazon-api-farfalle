@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BangazonAPI.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using BangazonAPI.Models;
-using Microsoft.AspNetCore.Http;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BangazonAPI.Controllers
 {
@@ -40,22 +40,34 @@ namespace BangazonAPI.Controllers
                 {
                     string command = "";
                     string ordersColumns = "SELECT o.Id, o.PaymentTypeId, o.CustomerId";
-                    string ordersTable = "FROM Orders o";
+                    string ordersTable = "FROM [Order] o";
 
-                    if (include == "student")
+                    if (include == "products")
                     {
-                        string studentColumns = @", 
-                        s.Id AS 'Student Id', 
-                        s.firstName AS 'Student First Name', 
-                        s.lastName AS 'Student Last Name',
-                        s.slackHandle AS 'Slack Handle'";
-                        string studentsTable = @"
-                         JOIN StudentExercise se ON e.Id = se.exerciseId 
-                        JOIN Student s ON se.StudentId=s.Id;";
+                        string productColumns = @", 
+                        p.Id AS 'Product Id', 
+                        p.Title AS 'Product Title'";
+                        string productTable = @"
+                        JOIN OrderProduct op ON o.Id = op.OrderId 
+                        JOIN Product p ON op.ProductId = p.Id;";
                         command = $@"{ordersColumns} 
-                                    {studentColumns} 
+                                    {productColumns} 
                                     {ordersTable} 
-                                    {studentsTable}";
+                                    {productTable}";
+
+                    }
+                    if (include == "customers")
+                    {
+                        string customerColumns = @",
+                        c.FirstName AS 'Customer First'
+                        c.LastName AS 'Customer Last'";
+                        string customerTable = @"
+                        JOIN PaymentType pt ON o.Id = pt.PaymentTypeId 
+                        JOIN Customer c ON pt.CustomerId = c.Id;";
+                        command = $@"{ordersColumns} 
+                                    {customerColumns} 
+                                    {ordersTable} 
+                                    {customerTable}";
 
                     }
                     else
@@ -65,22 +77,21 @@ namespace BangazonAPI.Controllers
 
                     cmd.CommandText = command;
                     SqlDataReader reader = cmd.ExecuteReader();
-                    List<Exercise> Exercises = new List<Exercise>();
+                    List<Order> Orders = new List<Order>();
 
                     while (reader.Read())
                     {
 
-                        Exercise Exercise = new Exercise
+                        Order Order = new Order
                         {
-                            id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("name")),
-                            Language = reader.GetString(reader.GetOrdinal("language"))
-
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
                         };
 
                         if (include == "student")
                         {
-                            Student currentStudent = new Student
+                            currentStudent = new Student
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Student Id")),
                                 FirstName = reader.GetString(reader.GetOrdinal("Student First Name")),
@@ -88,9 +99,9 @@ namespace BangazonAPI.Controllers
                                 SlackHandle = reader.GetString(reader.GetOrdinal("Slack Handle"))
                             };
 
-                            if (Exercises.Any(e => e.id == Exercise.id))
+                            if (Exercises.Any(e => e.id == Order.id))
                             {
-                                Exercise thisExercise = Exercises.Where(e => e.id == Exercise.id).FirstOrDefault();
+                                Order thisExercise = Order.Where(e => e.id == Order.id).FirstOrDefault();
                                 thisExercise.assignedStudents.Add(currentStudent);
                             }
                             else
@@ -103,7 +114,7 @@ namespace BangazonAPI.Controllers
                         }
                         else
                         {
-                            Exercises.Add(Exercise);
+                            Exercises.Add(Order);
 
                         }
 
