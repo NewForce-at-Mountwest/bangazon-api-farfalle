@@ -131,6 +131,7 @@ namespace BangazonAPI.Controllers
 
         //GET: Code for getting a single department (active or not)
         [HttpGet("{id}", Name = "Department")]
+
         public async Task<IActionResult> GetSingleDepartment([FromRoute] int id, string _include)
         {
             using (SqlConnection conn = Connection)
