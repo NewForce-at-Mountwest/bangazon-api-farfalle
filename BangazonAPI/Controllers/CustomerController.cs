@@ -30,7 +30,7 @@ namespace BangazonAPI.Controllers
             }
 
             [HttpGet]
-            public async Task<IActionResult> Get(string include, string q)
+            public async Task<IActionResult> Get(string include, string q, string active)
             {
                 using (SqlConnection conn = Connection)
                 {
@@ -54,7 +54,10 @@ namespace BangazonAPI.Controllers
 
                         string productTable = " JOIN Product ON Product.CustomerId = Customer.Id";
 
-                        string searchTable = $" WHERE Customer.FirstName LIKE '%{q}%' OR Customer.LastName LIKE '%{q}%'";
+                        string searchTable = $" Customer.FirstName LIKE '%{q}%' OR Customer.LastName LIKE '%{q}%'";
+
+                        string orderColumns = $", o.id as 'orderId'";
+                        string orderTable = " LEFT JOIN [Order] o ON o.CustomerId = Customer.id WHERE o.id IS NULL";
 
                         //Conditionals for query strings
 
@@ -68,20 +71,30 @@ namespace BangazonAPI.Controllers
                             command = $"{customerColumns}{productColumns}{customerTable}{productTable}";
                                               
                         }
+                        //Looks for customers that have not yet placed an order
+                        else if (active == "false")
+                        {
+                        command = $"{customerColumns}{orderColumns}{customerTable}{orderTable}";
+
+                        }
                         else
                         {
                             command = $"{customerColumns}{customerTable}";      
                         
                         }
 
-                    if (q != null)
-                    {
-                        command = $"{command}{searchTable}";
+                         if (q != null && active != "false")
+                        {
+                        command += $" WHERE{searchTable}";
                         
-                    } else
-                    {
-                        command = command;
-                    }
+                        } 
+                         else if(q!= null)
+                        {
+                        command += $" AND{searchTable}";
+                        }
+                                    
+                   
+
 
                     cmd.CommandText = command;
 
@@ -141,7 +154,10 @@ namespace BangazonAPI.Controllers
                         //If customer is already in the list, adds only the product, otherwise adds the product and the customer
 
                         if (include == "products")
+                            
                             {
+                            
+                            
                                 Product product = new Product()
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
@@ -158,16 +174,18 @@ namespace BangazonAPI.Controllers
                                     Customer currentCustomer = customers.Where(x => x.Id == customer.Id).FirstOrDefault();
 
                                     currentCustomer.Products.Add(product);
-                            } else
+                                }
+                                else
                                 {
                                     customer.Products.Add(product);
                                     customers.Add(customer);
                                 }
+                            
                             }
 
                         //Adds customer to list if it is missing if an include is NotFiniteNumberException used
 
-                        if(!customers.Any(x => x.Id == customer.Id))
+                        if (!customers.Any(x => x.Id == customer.Id))
                         {
                             customers.Add(customer);
                         }
