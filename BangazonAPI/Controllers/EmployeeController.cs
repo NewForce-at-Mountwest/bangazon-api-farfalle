@@ -41,9 +41,9 @@ namespace BangazonAPI.Controllers
                     string command = $@"SELECT e.Id AS 'Employee Id', e.FirstName, e.LastName, e.IsSuperVisor, e.DepartmentId,
                         d.Id AS 'Department Id', d.Name AS 'Department', d.Budget ,c.Id AS 'Computer Id', 
 						c.Make, c.Manufacturer, c.PurchaseDate, c.DecomissionDate
-                        FROM Employee e JOIN Department d ON e.DepartmentId = d.Id
-						JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
-                        JOIN Computer c ON ce.ComputerId=c.Id";
+                        FROM Employee e FULL JOIN Department d ON e.DepartmentId = d.Id
+						LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
+                        LEFT JOIN Computer c ON ce.ComputerId=c.Id";
 
                     cmd.CommandText = command;
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -73,19 +73,27 @@ namespace BangazonAPI.Controllers
                                 Id = reader.GetInt32(reader.GetOrdinal("Computer Id")),
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+
                                
                             }
                             
                     };
 
 
-
+                     
                         if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
                         {
                             employee.CurrentComputer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
 
-                    };
+                        }
+                        else
+                        {
+                            employee.CurrentComputer.DecomissionDate = DateTime.MinValue;
+                        };
+
+                    
+
 
 
 
@@ -104,7 +112,7 @@ namespace BangazonAPI.Controllers
         
 
 
-        [HttpGet("{id}", Name = "GetExercise")]
+        [HttpGet("{id}", Name = "GetEmployee")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             using (SqlConnection conn = Connection)
@@ -115,9 +123,9 @@ namespace BangazonAPI.Controllers
                     cmd.CommandText = @"SELECT e.Id AS 'Employee Id', e.FirstName, e.LastName, e.IsSuperVisor, e.DepartmentId,
                         d.Id AS 'Department Id', d.Name AS 'Department', d.Budget ,c.Id AS 'Computer Id', 
 						c.Make, c.Manufacturer, c.PurchaseDate, c.DecomissionDate
-                        FROM Employee e JOIN Department d ON e.DepartmentId = d.Id
-						JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
-                        JOIN Computer c ON ce.ComputerId=c.Id WHERE Id = @id";
+                        FROM Employee e FULL JOIN Department d ON e.DepartmentId = d.Id
+						LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
+                        LEFT JOIN Computer c ON ce.ComputerId=c.Id WHERE e.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -127,14 +135,38 @@ namespace BangazonAPI.Controllers
                     {
                         employee = new Employee
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                            Id = reader.GetInt32(reader.GetOrdinal("Employee Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor"))
+                            IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
+                            CurrentDepartment = new Department(){
+                                Id = reader.GetInt32(reader.GetOrdinal("Department Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Department")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            },
+                          
+                            CurrentComputer = new Computer()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Computer Id")),
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+
+                            }
 
                         };
                     }
+                    if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                    {
+                        employee.CurrentComputer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
+
+                    }
+                    else
+                    {
+                        employee.CurrentComputer.DecomissionDate = DateTime.MinValue;
+
+                    };
                     reader.Close();
 
                     return Ok(employee);
@@ -211,7 +243,7 @@ namespace BangazonAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id, bool PeteyDeletey)
         {
             try
             {
@@ -220,7 +252,12 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM Exercise WHERE id = @id";
+                        if (PeteyDeletey == true)
+                        {
+                            cmd.CommandText = @"DELETE Employee Where Id = @id";
+                        }
+                    
+                       
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
