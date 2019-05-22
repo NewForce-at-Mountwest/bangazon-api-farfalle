@@ -23,8 +23,8 @@ namespace TestBangazonAPI
                 FirstName = "Bob",
                 LastName = "Bobberson",
                 IsSuperVisor = true,
-                DepartmentId = 1, 
-            
+                DepartmentId = 1,
+          
             };
             //turn the Employee into json
             string employeeAsJSON = JsonConvert.SerializeObject(employee);
@@ -112,7 +112,7 @@ namespace TestBangazonAPI
                 Assert.Equal("Bob", newEmployee.FirstName);
 
                 // delete Bob
-                deleteEmployee(newEmployee, client);
+                await deleteEmployee(newEmployee, client);
             }
         }
 
@@ -145,7 +145,7 @@ namespace TestBangazonAPI
 
 
                 // fire bob
-                deleteEmployee(newEmployee, client);
+               await deleteEmployee(newEmployee, client);
             }
         }
 
@@ -207,8 +207,8 @@ namespace TestBangazonAPI
 
                 Assert.Equal(newName, modifiedEmployee.FirstName);
 
-                // DELETE BOB
-                deleteEmployee(modifiedEmployee, client);
+                // fire this guy
+                await deleteEmployee(modifiedEmployee, client);
             }
         }
     }

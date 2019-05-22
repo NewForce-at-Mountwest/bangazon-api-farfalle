@@ -9,6 +9,9 @@ using System.Data.SqlClient;
 using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
 
+//This is the employee controller, which should have get all, one, create, and update functionality. Additionally, there is a request for delete which will ONLY run if you use the super secret code as a query in your request (PeteyDeletey=true). This is to prevent the test for this controller from flooding the database. Whether you fetch all employees or just one, you should see an employee with their department and current computer, if applicable. HOPEFULLY, if an employee isn't assigned a computer, the CurrentComputer type on the employee should show as null.
+
+   //by: Connor FitzGerald
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -38,6 +41,8 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+
+                    //joins employee, department, and computer tables
                     string command = $@"SELECT e.Id AS 'Employee Id', e.FirstName, e.LastName, e.IsSuperVisor, e.DepartmentId,
                         d.Id AS 'Department Id', d.Name AS 'Department', d.Budget ,c.Id AS 'Computer Id', 
 						c.Make, c.Manufacturer, c.PurchaseDate, c.DecomissionDate
@@ -48,9 +53,11 @@ namespace BangazonAPI.Controllers
                     cmd.CommandText = command;
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Employee> employees = new List<Employee>();
-                    
+
                     while (reader.Read())
                     {
+
+                        //currentcomputer will default to null, because...
 
                         Employee employee = new Employee
                         {
@@ -59,56 +66,46 @@ namespace BangazonAPI.Controllers
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             CurrentDepartment = new Department()
-                            
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Department Id")),
                                 Name = reader.GetString(reader.GetOrdinal("Department")),
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             },
                             IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
+                            CurrentComputer = null
 
-
-                            CurrentComputer = new Computer()
+                        };
+                        //if the reader finds a value for an employee under the computer id column, it will attach the computer to the employee under their currentcomputer
+                        if (!reader.IsDBNull(reader.GetOrdinal("Computer Id")))
+                        {
+                            Computer computer = new Computer()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Computer Id")),
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
                                 PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                      
+                            };
+                            employee.CurrentComputer = computer;
+                        }
 
-                               
-                            }
-                            
-                    };
+                        //this checks to see if the decomissiondate for a computer exists, if it does, it sets the date on the computer
 
-
-                     
                         if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
                         {
                             employee.CurrentComputer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
 
                         }
-                        else
-                        {
-                            employee.CurrentComputer.DecomissionDate = DateTime.MinValue;
-                        };
-
                     
 
-
-
-
                         employees.Add(employee);
-
-
-                        
                     }
                     reader.Close();
                     return Ok(employees);
-                       
-                    
                 }
             }
         }
+        
         
 
 
@@ -117,6 +114,8 @@ namespace BangazonAPI.Controllers
         {
             using (SqlConnection conn = Connection)
             {
+
+                //same as above, but just for one person
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
@@ -133,40 +132,45 @@ namespace BangazonAPI.Controllers
 
                     if (reader.Read())
                     {
-                        employee = new Employee
+
+                       employee = new Employee
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Employee Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
-                            CurrentDepartment = new Department(){
+                            CurrentDepartment = new Department()
+                            {
                                 Id = reader.GetInt32(reader.GetOrdinal("Department Id")),
                                 Name = reader.GetString(reader.GetOrdinal("Department")),
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             },
-                          
-                            CurrentComputer = new Computer()
+                            IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
+                            CurrentComputer = null
+
+                        };
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("Computer Id")))
+                        {
+                            Computer computer = new Computer()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Computer Id")),
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                      
+                            };
+                            employee.CurrentComputer = computer;
+                        }
 
-                            }
+                        if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                        {
+                            employee.CurrentComputer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
 
-                        };
+                        }
+                     
+
                     }
-                    if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
-                    {
-                        employee.CurrentComputer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
-
-                    }
-                    else
-                    {
-                        employee.CurrentComputer.DecomissionDate = DateTime.MinValue;
-
-                    };
                     reader.Close();
 
                     return Ok(employee);
@@ -175,6 +179,8 @@ namespace BangazonAPI.Controllers
         }
 
         [HttpPost]
+
+        //post an employee
         public async Task<IActionResult> Post([FromBody] Employee employee)
         {
             using (SqlConnection conn = Connection)
@@ -198,6 +204,8 @@ namespace BangazonAPI.Controllers
         }
 
         [HttpPut("{id}")]
+
+        //update
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Employee employee)
         {
             try
@@ -243,6 +251,8 @@ namespace BangazonAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+
+        //this delete wont actually do anything unless you include the query string PeteyDeletey=true
         public async Task<IActionResult> Delete([FromRoute] int id, bool PeteyDeletey)
         {
             try
@@ -283,6 +293,8 @@ namespace BangazonAPI.Controllers
         }
 
         private bool EmployeeExists(int id)
+
+           //this method just makes sure the employee is a real life human bean in our database, which is referenced above
         {
             using (SqlConnection conn = Connection)
             {
