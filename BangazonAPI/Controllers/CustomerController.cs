@@ -79,9 +79,7 @@ namespace BangazonAPI.Controllers
                         command = $"{command}{searchTable}";
                         
                     } else
-                    {
-                        command = command;
-                    }
+                    {}
 
                     cmd.CommandText = command;
 

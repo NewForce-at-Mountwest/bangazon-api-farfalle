@@ -36,98 +36,85 @@ namespace BangazonAPI.Controllers
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
+
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     string command = "";
-                    string ordersColumns = "SELECT o.Id, o.PaymentTypeId, o.CustomerId";
-                    string ordersTable = "FROM [Order] o";
+                    string selectOrders = @"SELECT o.Id, o.PaymentTypeId, o.CustomerId";
 
-                    if (include == "products")
-                    {
-                        string productColumns = @", 
-                        p.Id AS 'Product Id', 
-                        p.Title AS 'Product Title'";
-                        string productTable = @"
-                        JOIN OrderProduct op ON o.Id = op.OrderId 
-                        JOIN Product p ON op.ProductId = p.Id;";
-                        command = $@"{ordersColumns} 
-                                    {productColumns} 
-                                    {ordersTable} 
-                                    {productTable}";
+                    string fromOrder = " FROM [Order] o";
 
-                    }
+                    string customerString = ", c.Id, c.FirstName, c.LastName";
+
+                    string join = " JOIN PaymentType pt ON o.Id = pt.CustomerId JOIN Customer c ON pt.CustomerId = c.Id JOIN OrderProduct op ON o.Id = op.OrderId JOIN Product p ON op.ProductId = p.Id";
+
+                    string productString = ", p.Id, p.ProductTypeId, p.CustomerId, p.Price, p.Title, p.Description, p.Quantity, p.CustomerId";
+
+                    //Conditionals for query strings
+
                     if (include == "customers")
                     {
-                        string customerColumns = @",
-                        c.FirstName AS 'Customer First'
-                        c.LastName AS 'Customer Last'";
-                        string customerTable = @"
-                        JOIN PaymentType pt ON o.Id = pt.PaymentTypeId 
-                        JOIN Customer c ON pt.CustomerId = c.Id;";
-                        command = $@"{ordersColumns} 
-                                    {customerColumns} 
-                                    {ordersTable} 
-                                    {customerTable}";
+                        command = $"{selectOrders}{customerString}{fromOrder}{join}";
+
+                    }
+                    else if (include == "products")
+                    {
+                        command = $"{selectOrders}{productString}{fromOrder}{join}";
 
                     }
                     else
                     {
-                        command = $"{ordersColumns} {ordersTable}";
-                    }
+                        command = $"{selectOrders}{fromOrder}";
 
+                    }
                     cmd.CommandText = command;
+
                     SqlDataReader reader = cmd.ExecuteReader();
-                    List<Order> Orders = new List<Order>();
+                    List<Order> orders = new List<Order>();
 
                     while (reader.Read())
                     {
-
-                        Order Order = new Order
+                        Order order = new Order
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
                             CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
                         };
-
-                        if (include == "student")
+                        orders.Add(order);
+                        if (include == "customers")
                         {
-                            currentStudent = new Student
+                            Customer customer = new Customer()
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Student Id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("Student First Name")),
-                                LastName = reader.GetString(reader.GetOrdinal("Student Last Name")),
-                                SlackHandle = reader.GetString(reader.GetOrdinal("Slack Handle"))
+                                Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
                             };
-
-                            if (Exercises.Any(e => e.id == Order.id))
+                            order.customer = customer;
+                        }
+                        if (include == "products")
+                        {
+                            Product products = new Product()
                             {
-                                Order thisExercise = Order.Where(e => e.id == Order.id).FirstOrDefault();
-                                thisExercise.assignedStudents.Add(currentStudent);
-                            }
-                            else
-                            {
-                                Exercise.assignedStudents.Add(currentStudent);
-                                Exercises.Add(Exercise);
-
-                            }
-
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                            };
+                            order.Products.Add(products);
                         }
                         else
-                        {
-                            Exercises.Add(Order);
-
-                        }
-
+                        { }
                     }
                     reader.Close();
-
-
-                    return Ok(Exercises);
+                    return Ok(orders);
                 }
             }
         }
 
-        [HttpGet("{id}", Name = "GetExercise")]
+        [HttpGet("{id}", Name = "GetOrder")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             using (SqlConnection conn = Connection)
@@ -135,55 +122,53 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"
-                        SELECT
-                            Id, name, language
-                        FROM Exercise
-                        WHERE Id = @id";
+                    cmd.CommandText = @"SELECT Id, PaymentTypeId, CustomerId FROM [Order] WHERE Id = @id";
+
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    Exercise Exercise = null;
+                    Order order = null;
 
                     if (reader.Read())
                     {
-                        Exercise = new Exercise
+                        order = new Order
                         {
-                            id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("name")),
-                            Language = reader.GetString(reader.GetOrdinal("lastName"))
-
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
                         };
+
                     }
                     reader.Close();
-
-                    return Ok(Exercise);
+                    return Ok(order);
                 }
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Exercise Exercise)
+        public async Task<IActionResult> Post([FromBody] Order order)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Exercise (name, language)
-                                        OUTPUT INSERTED.Id
-                                        VALUES (@name, @lang)";
-                    cmd.Parameters.Add(new SqlParameter("@name", Exercise.Name));
-                    cmd.Parameters.Add(new SqlParameter("@lang", Exercise.Language));
+                    cmd.CommandText = "INSERT INTO [Order] (PaymentTypeId, CustomerId) OUTPUT INSERTED.Id VALUES (@PaymentTypeId, @CustomerId)";
+                    cmd.Parameters.Add(new SqlParameter("@PaymentTypeId", order.PaymentTypeId));
+                    cmd.Parameters.Add(new SqlParameter("@CustomerId", order.CustomerId));
+
+
                     int newId = (int)cmd.ExecuteScalar();
-                    Exercise.id = newId;
-                    return CreatedAtRoute("GetExercise", new { id = newId }, Exercise);
+                    order.Id = newId;
+                    return CreatedAtRoute("GetOrder", new { id = newId }, order);
                 }
             }
         }
 
+
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Exercise Exercise)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Order order)
         {
             try
             {
@@ -192,12 +177,13 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Exercise
-                                            SET name=@n, 
-                                            language=@lang, 
-                                            WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@n", Exercise.Name));
-                        cmd.Parameters.Add(new SqlParameter("@lang", Exercise.Language));
+                        cmd.CommandText = @"UPDATE [Order] SET PaymentTypeId = @PaymentTypeId, CustomerId = @CustomerId WHERE Id = @id";
+
+
+                        cmd.Parameters.Add(new SqlParameter("@PaymentTypeId", order.PaymentTypeId));
+                        cmd.Parameters.Add(new SqlParameter("@CustomerId", order.CustomerId));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
@@ -209,7 +195,7 @@ namespace BangazonAPI.Controllers
             }
             catch (Exception)
             {
-                if (!ExerciseExists(id))
+                if (!OrderExists(id))
                 {
                     return NotFound();
                 }
@@ -230,7 +216,7 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM Exercise WHERE Id = @id";
+                        cmd.CommandText = @"DELETE FROM [Order] WHERE ID = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
@@ -241,10 +227,12 @@ namespace BangazonAPI.Controllers
                         throw new Exception("No rows affected");
                     }
                 }
+
             }
             catch (Exception)
+
             {
-                if (!ExerciseExists(id))
+                if (!OrderExists(id))
                 {
                     return NotFound();
                 }
@@ -255,18 +243,14 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        private bool ExerciseExists(int id)
+        private bool OrderExists(int id)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"
-                        SELECT
-                            name, language
-                        FROM Exercise
-                        WHERE Id = @id";
+                    cmd.CommandText = @"SELECT Id, PaymentTypeId, CustomerId FROM Order WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -274,5 +258,6 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
     }
 }
