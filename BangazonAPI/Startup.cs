@@ -45,7 +45,7 @@ namespace BangazonAPI
             app.UseCors(builder =>
             {
                 //builder.WithOrigins("http://127.0.0.1:8080/");
-                builder.AllowAnyOrigin();
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 
             });
 
