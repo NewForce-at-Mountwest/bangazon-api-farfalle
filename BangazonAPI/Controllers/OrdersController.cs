@@ -48,11 +48,11 @@ namespace BangazonAPI.Controllers
 
                     string productString = ", p.Id AS 'ProductId', p.ProductTypeId, p.CustomerId, p.Price, p.Title, p.Description, p.Quantity, p.CustomerId";
 
-                    string completedTrue = "WHERE PaymentTypeId > 1";
-                    string completedFalse = "WHERE PaymentTypeId = 1";
+                    string completedTrue = " WHERE PaymentTypeId IS NOT NULL";
+                    string completedFalse = " WHERE PaymentTypeId IS NULL";
 
                     //Conditionals for query strings
-
+                    
                     if (include == "customers")
                     {
                         command = $"{selectOrders}{customerString}{fromOrder}{join}";
@@ -73,11 +73,12 @@ namespace BangazonAPI.Controllers
                         command += $"{completedFalse}";
 
                     }
-                    if (completed == "true")
+                    else if (completed == "true")
                     {
                         command += $"{completedTrue}";
 
                     }
+
                     cmd.CommandText = command;
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -88,10 +89,13 @@ namespace BangazonAPI.Controllers
                         Order order = new Order
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
                             CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
                         };
                         orders.Add(order);
+                        if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
+                        {
+                            order.PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"));
+                        }
                         if (include == "customers")
                         {
                             Customer customer = new Customer()
@@ -145,10 +149,12 @@ namespace BangazonAPI.Controllers
                         order = new Order
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
                             CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
                         };
-
+                        if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
+                        {
+                            order.PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"));
+                        }
                     }
                     reader.Close();
                     return Ok(order);
