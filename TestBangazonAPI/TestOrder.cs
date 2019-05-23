@@ -158,7 +158,7 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(3, newOrder.PaymentTypeId);
                 Assert.Equal(3, newOrder.CustomerId);
-                Assert.NotNull(newOrder.Customers);
+                Assert.NotNull(newOrder.customer);
 
                 // Clean up after ourselves- delete david!
                 deleteOrder(newOrder, client);

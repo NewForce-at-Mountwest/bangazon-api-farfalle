@@ -31,7 +31,7 @@ namespace BangazonAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(string include)
+        public async Task<IActionResult> Get(string include, string completed)
         {
             using (SqlConnection conn = Connection)
             {
@@ -48,7 +48,10 @@ namespace BangazonAPI.Controllers
 
                     string join = " JOIN PaymentType pt ON o.Id = pt.CustomerId JOIN Customer c ON pt.CustomerId = c.Id JOIN OrderProduct op ON o.Id = op.OrderId JOIN Product p ON op.ProductId = p.Id";
 
-                    string productString = ", p.Id, p.ProductTypeId, p.CustomerId, p.Price, p.Title, p.Description, p.Quantity, p.CustomerId";
+                    string productString = ", p.Id AS 'ProductId', p.ProductTypeId, p.CustomerId, p.Price, p.Title, p.Description, p.Quantity, p.CustomerId";
+
+                    string completedTrue = "WHERE PaymentTypeId > 1";
+                    string completedFalse = "WHERE PaymentTypeId = 1";
 
                     //Conditionals for query strings
 
@@ -65,6 +68,16 @@ namespace BangazonAPI.Controllers
                     else
                     {
                         command = $"{selectOrders}{fromOrder}";
+
+                    }
+                    if (completed == "false")
+                    {
+                        command += $"{completedFalse}";
+
+                    }
+                    if (completed == "true")
+                    {
+                        command += $"{completedTrue}";
 
                     }
                     cmd.CommandText = command;
@@ -95,7 +108,7 @@ namespace BangazonAPI.Controllers
                         {
                             Product products = new Product()
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
                                 ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
                                 CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                 Price = reader.GetInt32(reader.GetOrdinal("Price")),
