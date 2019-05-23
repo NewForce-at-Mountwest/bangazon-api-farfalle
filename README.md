@@ -1,6 +1,6 @@
 # Bangazon Platform API
 
-## To test for each feature: 
+## To test for each feature:
 
 
 
@@ -17,7 +17,9 @@ ProductType should have full CRUD functionality with corresponding tests. Delete
 To test, run tests, make sure they all pass. Check all routes for get single, get all, etc. Post a new type to the server using postman, then, delete it using the base delete. Get the new type you just made, and check that IsActive was set to false. If you end up with the base three types that you started with, it *SHOULD* all be working.
 
 ### Customers:
-
+Endpoint - https://localhost:5001/api/customer
+GET, POST, PUT, and DELETE methods supported.
+Users may use the following query strings: /?include=products to display all the customer's products, /?include=paymentTypes to display all the customer's payment types, /?active=false to see a list of inactive customers, and /?q={your text here} to search for all customers with first or last names containing the sequence of letters specified in the query,.
 
 ### Orders:
 
@@ -35,7 +37,8 @@ To test, run employee tests, make sure they all pass. Run client, make sure you 
 
 
 ### Training programs:
-
+Endpoint - https://localhost:5001/api/trainingprogram
+GET, POST, PUT, and DELETE methods supported. A "completed=false" query string may also be used to only see training programs that occur in the future or are currently ongoing.
 
 ### Departments:
 
