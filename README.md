@@ -5,7 +5,8 @@
 
 
 ### Products:
-endpoint: https://localhost:5001/api/product
+Endpoint: https://localhost:5001/api/product
+
 supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT, DELETE)
 Additional queries: none
 
