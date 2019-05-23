@@ -39,7 +39,6 @@ namespace TestBangazonAPI
 
         }
 
-        // Delete a student in the database and make sure we get a no content status code back
         public async Task deleteOrder(Order One, HttpClient client)
         {
             HttpResponseMessage deleteResponse = await client.DeleteAsync($"api/Orders/{One.Id}");
@@ -56,7 +55,7 @@ namespace TestBangazonAPI
             using (HttpClient client = new APIClientProvider().Client)
             {
 
-                // Call the route to get all our students; wait for a response object
+                // Call the route to get all; wait for a response object
                 HttpResponseMessage response = await client.GetAsync("api/Orders");
 
                 // Make sure that a response comes back at all
@@ -65,13 +64,12 @@ namespace TestBangazonAPI
                 // Read the response body as JSON
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                // Convert the JSON to a list of student instances
+                // Convert the JSON to a list
                 List<Order> orderList = JsonConvert.DeserializeObject<List<Order>>(responseBody);
 
                 // Did we get back a 200 OK status code?
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-                // Are there any students in the list?
                 Assert.True(orderList.Count > 0);
             }
         }
@@ -108,10 +106,10 @@ namespace TestBangazonAPI
             using (HttpClient client = new APIClientProvider().Client)
             {
 
-                // Create a new student
+                // Create new
                 Order newOrder = await createOrder(client);
 
-                // Try to get that student from the database
+                // Try to get from the database
                 HttpResponseMessage response = await client.GetAsync($"api/Orders/{newOrder.Id}/?include=products");
 
                 response.EnsureSuccessStatusCode();
@@ -128,7 +126,7 @@ namespace TestBangazonAPI
                 Assert.Equal(3, newOrder.CustomerId);
                 Assert.NotNull(newOrder.Products);
 
-                // Clean up after ourselves- delete david!
+                // Clean up
                 deleteOrder(newOrder, client);
             }
         }
@@ -140,10 +138,10 @@ namespace TestBangazonAPI
             using (HttpClient client = new APIClientProvider().Client)
             {
 
-                // Create a new student
+                // Create new
                 Order newOrder = await createOrder(client);
 
-                // Try to get that student from the database
+                // Try to get from the database
                 HttpResponseMessage response = await client.GetAsync($"api/Orders/{newOrder.Id}/?include=customer");
 
                 response.EnsureSuccessStatusCode();
@@ -159,7 +157,7 @@ namespace TestBangazonAPI
                 Assert.Equal(3, newOrder.PaymentTypeId);
                 Assert.Equal(3, newOrder.CustomerId);
 
-                // Clean up after ourselves- delete david!
+                // Clean up
                 deleteOrder(newOrder, client);
             }
         }
@@ -170,14 +168,14 @@ namespace TestBangazonAPI
             using (var client = new APIClientProvider().Client)
             {
 
-                // Create a new David
+                // Create new
                 Order newOrder = await createOrder(client);
 
-                // Make sure his info checks out
+                // Make sure info checks out
                 Assert.Equal(3, newOrder.PaymentTypeId);
                 Assert.Equal(3, newOrder.CustomerId);
 
-                // Clean up after ourselves - delete David!
+                // Clean up
                 deleteOrder(newOrder, client);
             }
         }
@@ -186,19 +184,15 @@ namespace TestBangazonAPI
         public async Task modifiedOrder()
         {
 
-            // We're going to change a student's name! This is their new name.
             int newPaymentTypeId = 2;
 
             using (HttpClient client = new APIClientProvider().Client)
             {
 
-                // Create a new student
                 Order newOrder = await createOrder(client);
 
-                // Change their first name
                 newOrder.PaymentTypeId = newPaymentTypeId;
 
-                // Convert them to JSON
                 string modifiedOrderAsJSON = JsonConvert.SerializeObject(newOrder);
 
                 // Make a PUT request with the new info
@@ -216,9 +210,6 @@ namespace TestBangazonAPI
                 // We should have gotten a no content status code
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-                /*
-                    GET section
-                 */
                 // Try to GET the student we just edited
                 HttpResponseMessage getOrder = await client.GetAsync($"api/Orders/{newOrder.Id}");
                 getOrder.EnsureSuccessStatusCode();
@@ -228,10 +219,9 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, getOrder.StatusCode);
 
-                // Make sure his name was in fact updated
                 Assert.Equal(newPaymentTypeId, modifiedOrder.PaymentTypeId);
 
-                // Clean up after ourselves- delete him
+                // Clean up
                 deleteOrder(modifiedOrder, client);
             }
         }
