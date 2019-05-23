@@ -88,15 +88,23 @@ namespace BangazonAPI.Controllers
                             {
                                 if (trainingPrograms.Any(x => x.Id == trainingProgram.Id)) {
                                     {
-                                        TrainingProgram program = trainingPrograms.Where(x => x.Id ==       trainingProgram.Id).FirstOrDefault();
-                                        program.Employees.Add(employee);
+                                        TrainingProgram program = trainingPrograms.Where(x => x.Id ==           trainingProgram.Id).FirstOrDefault();
+
+                                        //Check to see if employee is null before adding
+                                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                                        {
+                                            program.Employees.Add(employee);
+                                        }
 
                                     } 
 
                                 }
                                 else
                                 {
-                                    trainingProgram.Employees.Add(employee);
+                                    //Check to see if employee is null before adding
+                                    if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                                    { trainingProgram.Employees.Add(employee); }
+
                                     trainingPrograms.Add(trainingProgram);
                                 }
                             }
@@ -107,11 +115,17 @@ namespace BangazonAPI.Controllers
                             {
 
                                 TrainingProgram program = trainingPrograms.Where(x => x.Id == trainingProgram.Id).FirstOrDefault();
-                                program.Employees.Add(employee);
+
+                                //Check to see if employee is null before adding
+                                if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                                { program.Employees.Add(employee); }
 
                             } else
                             {
-                                trainingProgram.Employees.Add(employee);
+                                //Check to see if employee is null before adding
+                                if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId"))) { 
+                                    trainingProgram.Employees.Add(employee);
+                                }
                                 trainingPrograms.Add(trainingProgram);
                             }
                         }
