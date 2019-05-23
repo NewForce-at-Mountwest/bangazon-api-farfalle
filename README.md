@@ -11,7 +11,7 @@ Additional queries: none
 
 
 ### Product types:
-endpoint: https://localhost:5001/api/producttype
+Endpoint: https://localhost:5001/api/producttype
 supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT, DELETE)
 Additional queries: none
 
@@ -26,20 +26,20 @@ Users may use the following query strings: /?include=products to display all the
 
 
 ### Payment types:
-endpoint: https://localhost:5001/api/paymenttype
+Endpoint: https://localhost:5001/api/paymenttype
 supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT, DELETE (archives the payment type))
 Additional queries: ~paymenttype/?HardDelete=true will remove a payment type from the database instead of archiving it
 
 
 
 ### Employees:
-endpoint: https://localhost:5001/api/employee
+Endpoint: https://localhost:5001/api/employee
 supported HTTP Methods: (GET All, GET Single (by ID), POST, and PUT)
 Additional queries: ~employee/?PeteyDeletey=True  will actually delete an employee instead of archiving.
 
 
 ### Computers:
-endpoint: https://localhost:5001/api/computer
+Endpoint: https://localhost:5001/api/computer
 supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT, DELETE)
 Additional queries: ~computer/?HardDelete=true will remove a computer from the database instead of archiving it
 
@@ -49,12 +49,12 @@ Endpoint - https://localhost:5001/api/trainingprogram
 GET, POST, PUT, and DELETE methods supported. A "completed=false" query string may also be used to only see training programs that occur in the future or are currently ongoing.
 
 ### Employee Training
-endpoint: https://localhost:5001/api/employeetraining
+Endpoint: https://localhost:5001/api/employeetraining
 supported HTTP Methods: (POST, DELETE)
 Additional queries: none
 
 ### Departments:
-endpoint: https://localhost:5001/api/department
+Endpoint: https://localhost:5001/api/department
 supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT)
 Additional queries:  ~department/?_include=employees, will show all the employees in a department
         ~department/?_filter=budget&_gt={number} will show all the departments with a budget greater than {number}
