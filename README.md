@@ -23,27 +23,28 @@ To test, run tests, make sure they all pass. Check all routes for get single, ge
 Orders Controller includes full CRUD and testing for full CRUD.
 
 To Test:
-Press Ctrl+f5
-Go to https://localhost:5001/api/Orders in the browser. You should see all Orders.
-Go to https://localhost:5001/api/Orders/1 in the browser. You should see a single order.
-Go to https://localhost:5001/api/Orders?include=customers in the browser. You should see all orders with the customers expanded.
-Go to https://localhost:5001/api/Orders?include=products in the browser. You should see all orders with products expanded.
-Open Postman. Post to https://localhost:5001/api/Orders with the header:
+<ul>
+<li>Press Ctrl+f5</li>
+<li>Go to https://localhost:5001/api/Orders in the browser. You should see all Orders.</li>
+<li>Go to https://localhost:5001/api/Orders/1 in the browser. You should see a single order.</li>
+<li>Go to https://localhost:5001/api/Orders?include=customers in the browser. You should see all orders with the customers expanded.</li>
+<li>Go to https://localhost:5001/api/Orders?include=products in the browser. You should see all orders with products expanded.</li>
+<li>Open Postman. Post to https://localhost:5001/api/Orders with the header:
 {
 "customerId": 3,
 "paymentTypeId": 3
-}
-You should see a new order at https://localhost:5001/api/Orders
-Put to https://localhost:5001/api/Orders/1 with the header:
+}</li>
+<li>You should see a new order at https://localhost:5001/api/Orders</li>
+<li>Put to https://localhost:5001/api/Orders/1 with the header:
 {
 "customerId": 1,
 "paymentTypeId": null
-}
-You should see that order 1 at https://localhost:5001/api/Orders/1 has changed.
-Delete to https://localhost:5001/api/Orders/2. Order number 2 should be deleted.
-Go to https://localhost:5001/api/Orders?completed=false. You should only see order 1.
-Go to https://localhost:5001/api/Orders?completed=true. You shouldn't see order 1.
-
+}</li>
+<li>You should see that order 1 at https://localhost:5001/api/Orders/1 has changed.</li>
+<li>Delete to https://localhost:5001/api/Orders/2. Order number 2 should be deleted.</li>
+<li>Go to https://localhost:5001/api/Orders?completed=false. You should only see order 1.</li>
+<li>Go to https://localhost:5001/api/Orders?completed=true. You shouldn't see order 1.</li>
+</ul>
 ### Payment types:
 
 
