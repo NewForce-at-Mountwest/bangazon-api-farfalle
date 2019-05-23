@@ -1,22 +1,26 @@
 # Bangazon Platform API
 
-## To test for each feature: 
+## To test for each feature:
 
 
 
 ### Products:
-Product Controller includes full CRUD and testing for full CRUD. Deleting a product should by default ARCHIVE the product by setting IsActive to false. To hard delete a product, the specific item must have a query parameter of HardDelete = true, which will fully delete the item.
+Endpoint: https://localhost:5001/api/product
 
-ex: (https://localhost:5001/api/product/99?HardDelete=true)
+supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT, DELETE)
+Additional queries: none
 
-To test, run the Product tests, then use postman to make sure that no new products are listed when you get all. Additionally, you should post a new product, run a soft delete on it, then get it again and make sure that IsActive is set to false.
 
 ### Product types:
-ProductType should have full CRUD functionality with corresponding tests. Delete on productType will only archive the type, query parameter of HardDelete=true will *ACTUALLY* hard delete.
-
-To test, run tests, make sure they all pass. Check all routes for get single, get all, etc. Post a new type to the server using postman, then, delete it using the base delete. Get the new type you just made, and check that IsActive was set to false. If you end up with the base three types that you started with, it *SHOULD* all be working.
+Endpoint: https://localhost:5001/api/producttype
+supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT, DELETE)
+Additional queries: none
 
 ### Customers:
+Endpoint - https://localhost:5001/api/customer
+GET, POST, PUT, and DELETE methods supported.
+Users may use the following query strings: /?include=products to display all the customer's products, /?include=paymentTypes to display all the customer's payment types, /?active=false to see a list of inactive customers, and /?q={your text here} to search for all customers with first or last names containing the sequence of letters specified in the query,.
+
 
 
 ### Orders:
@@ -46,21 +50,40 @@ To Test:
 <li>Go to https://localhost:5001/api/Orders?completed=true. You shouldn't see order 1.</li>
 </ul>
 ### Payment types:
+Endpoint: https://localhost:5001/api/paymenttype
+supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT, DELETE (archives the payment type))
+Additional queries: ~paymenttype/?HardDelete=true will remove a payment type from the database instead of archiving it
+
 
 
 ### Employees:
-The employee controller should have functionality to post, update, and get single/all employees. The delete request is included for testing purposes, so that our tests don't fill the database with dummy data. To run a delete, you must include "?PeteyDeletey=True" at the end of the user url.
-
-To test, run employee tests, make sure they all pass. Run client, make sure you can see both single and all employees. Posting to postman should work, and when you get all employees after testing, you should only see the base 3.
+Endpoint: https://localhost:5001/api/employee
+supported HTTP Methods: (GET All, GET Single (by ID), POST, and PUT)
+Additional queries: ~employee/?PeteyDeletey=True  will actually delete an employee instead of archiving.
 
 
 ### Computers:
+Endpoint: https://localhost:5001/api/computer
+supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT, DELETE)
+Additional queries: ~computer/?HardDelete=true will remove a computer from the database instead of archiving it
 
 
 ### Training programs:
+Endpoint - https://localhost:5001/api/trainingprogram
+GET, POST, PUT, and DELETE methods supported. A "completed=false" query string may also be used to only see training programs that occur in the future or are currently ongoing.
 
+### Employee Training
+Endpoint: https://localhost:5001/api/employeetraining
+supported HTTP Methods: (POST, DELETE)
+Additional queries: none
 
 ### Departments:
+Endpoint: https://localhost:5001/api/department
+supported HTTP Methods: (GET All, GET Single (by ID), POST, PUT)
+Additional queries:  ~department/?_include=employees, will show all the employees in a department
+        ~department/?_filter=budget&_gt={number} will show all the departments with a budget greater than {number}
+        ~department/q=delete_test_item will delete the department from the database (for test purposes only)
+
 
 
 #### Client side app can be found here: https://github.com/NewForce-at-Mountwest/bangazon-farfalle-react-client
