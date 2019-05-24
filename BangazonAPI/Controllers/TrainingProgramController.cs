@@ -46,7 +46,7 @@ namespace BangazonAPI.Controllers
                     //SqlCommands dependant on query strings
 
 
-                    cmd.CommandText = @"SELECT tp.Id, tp.Name, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id AS EmployeeId, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor  FROM TrainingProgram tp JOIN EmployeeTraining et on tp.Id = et.TrainingProgramId JOIN Employee e on e.Id = et.EmployeeId";
+                    cmd.CommandText = @"SELECT tp.Id, tp.Name, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id AS EmployeeId, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor  FROM TrainingProgram tp LEFT JOIN EmployeeTraining et on tp.Id = et.TrainingProgramId LEFT JOIN Employee e on e.Id = et.EmployeeId";
 
 
 
@@ -64,8 +64,10 @@ namespace BangazonAPI.Controllers
                             MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
                             Employees = new List<Employee>()
                         };
+                        Employee employee = null;
 
-                        Employee employee = new Employee
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId"))) { 
+                        employee = new Employee
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
@@ -73,6 +75,7 @@ namespace BangazonAPI.Controllers
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor"))
                         };
+                        }
 
 
                         DateTime now = DateTime.Now;
@@ -85,15 +88,23 @@ namespace BangazonAPI.Controllers
                             {
                                 if (trainingPrograms.Any(x => x.Id == trainingProgram.Id)) {
                                     {
-                                        TrainingProgram program = trainingPrograms.Where(x => x.Id == trainingProgram.Id).FirstOrDefault();
-                                        program.Employees.Add(employee);
+                                        TrainingProgram program = trainingPrograms.Where(x => x.Id ==           trainingProgram.Id).FirstOrDefault();
+
+                                        //Check to see if employee is null before adding
+                                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                                        {
+                                            program.Employees.Add(employee);
+                                        }
 
                                     } 
 
                                 }
                                 else
                                 {
-                                    trainingProgram.Employees.Add(employee);
+                                    //Check to see if employee is null before adding
+                                    if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                                    { trainingProgram.Employees.Add(employee); }
+
                                     trainingPrograms.Add(trainingProgram);
                                 }
                             }
@@ -104,11 +115,17 @@ namespace BangazonAPI.Controllers
                             {
 
                                 TrainingProgram program = trainingPrograms.Where(x => x.Id == trainingProgram.Id).FirstOrDefault();
-                                program.Employees.Add(employee);
+
+                                //Check to see if employee is null before adding
+                                if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                                { program.Employees.Add(employee); }
 
                             } else
                             {
-                                trainingProgram.Employees.Add(employee);
+                                //Check to see if employee is null before adding
+                                if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId"))) { 
+                                    trainingProgram.Employees.Add(employee);
+                                }
                                 trainingPrograms.Add(trainingProgram);
                             }
                         }
