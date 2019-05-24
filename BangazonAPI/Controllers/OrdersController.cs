@@ -46,7 +46,7 @@ namespace BangazonAPI.Controllers
 
                     string join = " JOIN PaymentType pt ON o.Id = pt.CustomerId JOIN Customer c ON pt.CustomerId = c.Id JOIN OrderProduct op ON o.Id = op.OrderId JOIN Product p ON op.ProductId = p.Id";
 
-                    string productString = ", p.Id AS 'ProductId', p.ProductTypeId, p.CustomerId, p.Price, p.Title, p.Description, p.Quantity, p.CustomerId";
+                    string productString = ", p.Id AS 'ProductId', p.ProductTypeId, p.CustomerId, p.Price, p.Title, p.[Description], p.Quantity, p.CustomerId";
 
                     string completedTrue = " WHERE PaymentTypeId IS NOT NULL";
                     string completedFalse = " WHERE PaymentTypeId IS NULL";
